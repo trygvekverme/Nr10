@@ -171,13 +171,13 @@ export class Budgie {
     // eyes with a pale iris ring and eyelids
     this.eyes = [];
     for (const s of [-1, 1]) {
-      const ring = new THREE.Mesh(new THREE.SphereGeometry(0.0031, 10, 8), plain(0xe9e6da));
+      const ring = new THREE.Mesh(new THREE.SphereGeometry(0.0037, 10, 8), plain(0xe9e6da));
       ring.position.set(s * 0.0136, 0.0034, 0.0088); ring.scale.set(0.45, 1, 1);
       head.add(ring);
-      const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.0022, 10, 8), plain(0x050505, { roughness: 0.08 }));
+      const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.0027, 10, 8), plain(0x050505, { roughness: 0.08 }));
       pupil.position.set(s * 0.0147, 0.0034, 0.0089); pupil.scale.set(0.5, 1, 1);
       head.add(pupil);
-      const lid = new THREE.Mesh(new THREE.SphereGeometry(0.0034, 10, 8), plain(0xe9d94a));
+      const lid = new THREE.Mesh(new THREE.SphereGeometry(0.004, 10, 8), plain(0xe9d94a));
       lid.position.set(s * 0.0143, 0.0034, 0.0088); lid.scale.set(0.5, 0.01, 1.05);
       head.add(lid);
       this.eyes.push({ ring, pupil, lid });

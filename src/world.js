@@ -21,11 +21,11 @@ export function buildWorld(scene, renderer, quality) {
   b.build(scene);
 
   // soft overall light
-  scene.add(new THREE.HemisphereLight(0xfbfaf6, 0xe6d8c2, 0.85));
+  scene.add(new THREE.HemisphereLight(0xfbfaf6, 0xe6d8c2, 0.6));
 
   // A nearly vertical "sky light" that only exists to give the furniture soft
   // grounding shadows (ceilings and walls do not cast).
-  const sun = new THREE.DirectionalLight(0xfff6ea, 1.25);
+  const sun = new THREE.DirectionalLight(0xfff6ea, 2.1);
   sun.position.set(-0.6, 14, 4.0);
   sun.target.position.set(0.9, 0, 6.2);
   sun.castShadow = quality.shadows;
@@ -34,7 +34,7 @@ export function buildWorld(scene, renderer, quality) {
   sun.shadow.mapSize.set(quality.shadowSize, quality.shadowSize);
   sun.shadow.bias = -0.0006;
   sun.shadow.normalBias = 0.025;
-  sun.shadow.radius = 3;
+  sun.shadow.radius = 4;
   sun.shadow.autoUpdate = false;
   sun.shadow.needsUpdate = true;
   scene.add(sun, sun.target);
