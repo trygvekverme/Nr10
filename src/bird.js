@@ -117,11 +117,11 @@ export class Bird {
     const descending = inp.v < -0.2 || this.vy < -0.3;
     let nearGround = false;
     if (this.airTime > 0.3) {
-      const g = this.world.below(this.pos.x, this.pos.y - 0.01, this.pos.z, 0.34, 0.085, this._g);
+      const g = this.world.below(this.pos.x, this.pos.y - 0.01, this.pos.z, 0.34, 0.07, this._g);
       if (g) {
         const h = this.pos.y - g.y;
         nearGround = descending && h < 0.34;
-        if (descending && h < 0.125 && Math.abs(this.speed) < 2.6) { this.land(g); return; }
+        if (descending && h < 0.125 && Math.abs(this.speed) < 2.6 && this.roomAt(g)) { this.land(g); return; }
       }
     }
 
@@ -158,6 +158,13 @@ export class Bird {
     p.headPitch = damp(p.headPitch, clamp(-this.vy * 0.12, -0.25, 0.3), 6, dt);
     p.headRoll = damp(p.headRoll, 0, 6, dt);
     p.fluff = damp(p.fluff, 0, 8, dt);
+  }
+
+  // Is there actually space for a bird on that spot (not hidden inside something)?
+  roomAt(g) {
+    const t = this._t.set(g.x, g.y + 0.045, g.z);
+    this.world.resolve(t, 0.03);
+    return Math.hypot(t.x - g.x, t.z - g.z) < 0.012 && Math.abs(t.y - g.y - 0.045) < 0.02;
   }
 
   land(g) {
@@ -303,7 +310,7 @@ export class Bird {
   tryHop(dx, dz) {
     const m = this.model;
     const tx = this.pos.x + dx, tz = this.pos.z + dz;
-    const g = this.world.below(tx, this.ground.y + 0.075, tz, 0.15, 0, this._g);
+    const g = this.world.below(tx, this.ground.y + 0.085, tz, 0.27, 0, this._g);
     if (!g) return false;
     // is there room for the bird at the destination?
     const t = this._t.set(tx, g.y + m.standHeight() + 0.01, tz);
@@ -312,7 +319,7 @@ export class Bird {
     this.world.resolve(t, 0.032);
     if (Math.hypot(t.x - hx, t.z - hz) > 0.008 || before !== before) return false;
     this.hop = {
-      t: 0, dur: 0.15, height: 0.02 + Math.max(0, g.y - this.ground.y) * 0.6,
+      t: 0, dur: 0.15 + Math.abs(g.y - this.ground.y) * 0.5, height: 0.02 + Math.max(0, g.y - this.ground.y) * 0.6,
       from: this.pos.clone(), to: new THREE.Vector3(tx, g.y + m.standHeight(), tz),
       ground: { y: g.y, x: tx, z: tz, box: g.box },
     };

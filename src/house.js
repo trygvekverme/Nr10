@@ -182,9 +182,9 @@ export function buildHouse(b, M) {
   b.box(-0.6, H + 0.1, 8.2, 5.0, LF, 8.9, M.parquet, fl);
   // white fascia around the stair opening
   const fa = { color: C.trim, solid: false, cast: false };
-  b.box(2.75, H - 0.01, 5.885, 5.0, LF + 0.01, 5.9, M.satin, fa);
-  b.box(2.735, H - 0.01, 5.9, 2.75, LF + 0.01, 7.3, M.satin, fa);
-  b.box(2.75, H - 0.01, 8.2, 5.0, LF + 0.01, 8.215, M.satin, fa);
+  b.box(2.75, H - 0.01, 5.9, 5.0, LF + 0.01, 5.915, M.satin, fa);
+  b.box(2.75, H - 0.01, 5.9, 2.765, LF + 0.01, 7.3, M.satin, fa);
+  b.box(2.75, H - 0.01, 8.185, 5.0, LF + 0.01, 8.2, M.satin, fa);
 
   // -------------------------------------------------------------- walls
   // north wall with dining window and terrace doors

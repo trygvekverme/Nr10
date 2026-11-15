@@ -162,7 +162,7 @@ export class Budgie {
     cere.scale.set(0.0046, 0.0027, 0.003); cere.position.set(0, 0.0032, 0.0166);
     head.add(cere);
     const beakMat = plain(0xcdb96a, { roughness: 0.4 });
-    const upper = new THREE.Mesh(new THREE.ConeGeometry(0.0041, 0.0095, 10), beakMat);
+    const upper = new THREE.Mesh(new THREE.ConeGeometry(0.0047, 0.011, 10), beakMat);
     upper.rotation.x = Math.PI * 0.86; upper.position.set(0, -0.0018, 0.0169); upper.scale.set(1, 1, 0.8);
     head.add(upper);
     this.lowerBeak = new THREE.Mesh(new THREE.ConeGeometry(0.0028, 0.005, 8), beakMat);

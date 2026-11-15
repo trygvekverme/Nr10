@@ -2,12 +2,132 @@
 <html lang="no">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#20241f">
 <title>Undulaten</title>
 <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
-<style>html,body{margin:0;height:100%;background:#111;overflow:hidden}canvas{display:block}</style>
+<style>
+  :root { --ink: #f6f3ea; --glass: rgba(24, 28, 24, 0.5); --line: rgba(255, 255, 255, 0.28); --accent: #f2dd4a; --green: #6cc644; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #20241f; color: var(--ink);
+    font: 16px/1.45 ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    overscroll-behavior: none; touch-action: none; user-select: none; -webkit-user-select: none; }
+  #surface { position: fixed; inset: 0; touch-action: none; cursor: grab; }
+  #surface:active { cursor: grabbing; }
+  canvas { display: block; width: 100%; height: 100%; }
+
+  /* ---------- title screen ---------- */
+  #start { position: fixed; inset: 0; display: grid; place-items: center; padding: 20px 16px;
+    background: radial-gradient(120% 90% at 50% 40%, rgba(20, 24, 20, 0.25), rgba(14, 16, 14, 0.78));
+    transition: opacity 0.6s ease, visibility 0.6s; overflow: auto; }
+  #start.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  .card { width: min(520px, 100%); text-align: center; }
+  .card h1 { margin: 0; font: 600 clamp(44px, 11vw, 78px)/1 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; letter-spacing: -0.01em;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45); }
+  .card h1 span { color: var(--accent); }
+  .card p.sub { margin: 10px 0 22px; font-size: clamp(15px, 3.6vw, 18px); opacity: 0.9; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5); }
+  #play { appearance: none; border: 0; border-radius: 999px; padding: 15px 46px; font-family: inherit; font-size: 20px; font-weight: 650; line-height: 1; color: #1c2415;
+    background: linear-gradient(#f7e65e, #e9cf36); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.6); cursor: pointer; }
+  #play:disabled { opacity: 0.6; cursor: default; }
+  #play:active { transform: translateY(1px); }
+  .keys { margin: 26px auto 0; padding: 14px 18px; border-radius: 18px; background: var(--glass); border: 1px solid var(--line);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: left; font-size: 14.5px; }
+  .keys h2 { margin: 0 0 8px; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; font-weight: 600; }
+  .keys dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; align-items: center; }
+  .keys dt { white-space: nowrap; }
+  .keys dd { margin: 0; opacity: 0.92; }
+  kbd { display: inline-block; min-width: 24px; padding: 2px 7px; border-radius: 7px; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.1);
+    font: 600 12.5px/1.5 ui-monospace, Menlo, Consolas, monospace; text-align: center; }
+  .keys .pc, .keys .mob { display: none; }
+  body:not(.touch) .keys .pc { display: block; }
+  body.touch .keys .mob { display: block; }
+
+  /* ---------- in-game HUD ---------- */
+  .hud { position: fixed; z-index: 3; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+  body.playing .hud { opacity: 1; pointer-events: auto; }
+  .round { appearance: none; border: 1px solid var(--line); background: var(--glass); color: var(--ink); border-radius: 50%;
+    display: grid; place-items: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); cursor: pointer; padding: 0; touch-action: none; }
+  .round svg { width: 46%; height: 46%; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .round.on { background: rgba(242, 221, 74, 0.85); color: #1c2415; border-color: transparent; transform: scale(0.95); }
+  #top { top: calc(10px + env(safe-area-inset-top)); right: calc(10px + env(safe-area-inset-right)); display: flex; gap: 8px; }
+  #top .round { width: 42px; height: 42px; }
+  #btnMusic.off { opacity: 0.55; }
+  #btnMusic.off svg .slash { display: block; }
+  #btnMusic svg .slash { display: none; }
+  #pad { right: calc(18px + env(safe-area-inset-right)); bottom: calc(22px + env(safe-area-inset-bottom)); display: none; grid-template-columns: auto auto; gap: 12px; align-items: end; }
+  body.touch #pad { display: grid; }
+  #pad .col { display: grid; gap: 12px; }
+  #btnUp, #btnDown { width: 76px; height: 76px; }
+  #btnChirp { width: 54px; height: 54px; }
+  #stick { position: fixed; z-index: 3; width: 128px; height: 128px; margin: -64px 0 0 -64px; border-radius: 50%; border: 1.5px solid var(--line);
+    background: rgba(24, 28, 24, 0.28); opacity: 0; pointer-events: none; transition: opacity 0.15s; }
+  #stick.on { opacity: 1; }
+  #knob { position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; border-radius: 50%; background: rgba(246, 243, 234, 0.85);
+    transform: translate(-50%, -50%); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3); }
+  #stickHint { left: calc(26px + env(safe-area-inset-left)); bottom: calc(34px + env(safe-area-inset-bottom)); width: 104px; height: 104px; border-radius: 50%;
+    border: 1.5px dashed var(--line); display: none; place-items: center; font-size: 12px; opacity: 0; color: rgba(255, 255, 255, 0.75); text-align: center; pointer-events: none !important; }
+  body.touch.playing #stickHint { display: grid; opacity: 0.8; }
+  body.stickused #stickHint { display: none !important; }
+  #hint { left: 50%; top: calc(16px + env(safe-area-inset-top)); transform: translateX(-50%); padding: 9px 16px; border-radius: 999px; background: var(--glass);
+    border: 1px solid var(--line); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font-size: 14.5px; text-align: center; max-width: calc(100vw - 32px); pointer-events: none !important; }
+  @media (max-width: 560px) { #hint { top: calc(62px + env(safe-area-inset-top)); width: max-content; } }
+  body.playing #hint { opacity: 0; }
+  body.playing #hint.show { opacity: 1; }
+  #help { position: fixed; inset: 0; z-index: 5; display: none; place-items: center; padding: 16px; background: rgba(14, 16, 14, 0.6); }
+  #help.show { display: grid; }
+  #help .keys { margin: 0; width: min(440px, 100%); }
+  @media (max-height: 520px) { .card p.sub { margin-bottom: 12px; } .keys { margin-top: 14px; } .card h1 { font-size: 44px; } }
+</style>
 </head>
 <body>
+<div id="surface"></div>
+
+<div id="start">
+  <div class="card">
+    <h1>Undu<span>laten</span></h1>
+    <p class="sub">Fly rundt i stua, land på møblene og se deg omkring.</p>
+    <button id="play" disabled>Laster&nbsp;…</button>
+    <div class="keys" id="keysCard">
+      <div class="pc">
+        <h2>Styring</h2>
+        <dl>
+          <dt><kbd>W</kbd> <kbd>S</kbd></dt><dd>Fly fremover / brems (hopp når du sitter)</dd>
+          <dt><kbd>A</kbd> <kbd>D</kbd></dt><dd>Sving</dd>
+          <dt><kbd>Mellomrom</kbd></dt><dd>Fly oppover / lett</dd>
+          <dt><kbd>Shift</kbd></dt><dd>Fly nedover / land</dd>
+          <dt>Dra med musa</dt><dd>Se deg rundt &nbsp;·&nbsp; hjul = zoom</dd>
+          <dt><kbd>E</kbd> &nbsp;<kbd>M</kbd></dt><dd>Kvitre &nbsp;·&nbsp; musikk av/på</dd>
+        </dl>
+      </div>
+      <div class="mob">
+        <h2>Styring</h2>
+        <dl>
+          <dt>Venstre tommel</dt><dd>Styrespak: fly fremover og sving</dd>
+          <dt>▲ &nbsp;▼</dt><dd>Fly opp / lett &nbsp;·&nbsp; fly ned / land</dd>
+          <dt>Dra til høyre</dt><dd>Se deg rundt</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="hint" class="hud"></div>
+<div id="top" class="hud">
+  <button id="btnMusic" class="round" aria-label="Musikk av/på"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/><path class="slash" d="M3 3l18 18"/></svg></button>
+  <button id="btnHelp" class="round" aria-label="Hjelp"><svg viewBox="0 0 24 24"><path d="M9 9a3 3 0 1 1 4.5 2.6c-.9.6-1.5 1.2-1.5 2.4"/><path d="M12 18h.01"/></svg></button>
+</div>
+<div id="stickHint" class="hud">styr<br>her</div>
+<div id="stick"><div id="knob"></div></div>
+<div id="pad" class="hud">
+  <button id="btnChirp" class="round" aria-label="Kvitre"><svg viewBox="0 0 24 24"><path d="M4 13c0-4 3-7 7-7 2 0 3 1 4 2l5 1-4 3c0 4-3 7-7 7H4l3-3c-2-1-3-2-3-3z"/><path d="M12 10h.01"/></svg></button>
+  <div class="col">
+    <button id="btnUp" class="round" aria-label="Fly opp"><svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg></button>
+    <button id="btnDown" class="round" aria-label="Fly ned / land"><svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12l7 7 7-7"/></svg></button>
+  </div>
+</div>
+<div id="help"><div class="keys" id="helpCard"></div></div>
+
+<script>document.getElementById('helpCard').innerHTML = document.getElementById('keysCard').innerHTML;</script>
 <script type="module" src="./src/main.js"></script>
 </body>
 </html>

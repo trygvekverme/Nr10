@@ -133,9 +133,9 @@ export function fabric() {
   const S = 256, [c, g] = cv(S, S), R = rng(8);
   g.fillStyle = '#f3f1ec'; g.fillRect(0, 0, S, S);
   for (let i = 0; i < S; i += 2) {
-    g.fillStyle = rgb(120, 115, 105, 0.05 + R() * 0.10);
+    g.fillStyle = rgb(120, 115, 105, 0.02 + R() * 0.06);
     g.fillRect(i, 0, 1, S);
-    g.fillStyle = rgb(120, 115, 105, 0.05 + R() * 0.10);
+    g.fillStyle = rgb(120, 115, 105, 0.02 + R() * 0.06);
     g.fillRect(0, i, S, 1);
   }
   blotches(g, R, S, S, 30, [[160, 155, 145], [255, 255, 255]], 20, 60, 0.08);
