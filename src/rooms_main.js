@@ -24,8 +24,8 @@ function shakerDoor(b, M, x, y, w, h, z, o = {}) {
     b.box(x + f, y + h - f, z, x + w - f, y + h - g, z + 0.02, M.wood, { ...wo, uvSwap: false });
     b.box(x + f, y + f, z + 0.008, x + w - f, y + h - f, z + 0.012, M.glass, { solid: false, cast: false });
     // leaded pattern
-    for (let k = 1; k < 3; k++) b.box(x + f + (w - 2 * f) * k / 3 - 0.003, y + f, z + 0.012, x + f + (w - 2 * f) * k / 3 + 0.003, y + h - f, z + 0.015, M.satin, { color: 0x3a3a3a, solid: false, cast: false });
-    for (let k = 1; k < 6; k++) b.box(x + f, y + f + (h - 2 * f) * k / 6 - 0.003, z + 0.012, x + w - f, y + f + (h - 2 * f) * k / 6 + 0.003, z + 0.015, M.satin, { color: 0x3a3a3a, solid: false, cast: false });
+    for (let k = 1; k < 3; k++) b.box(x + f + (w - 2 * f) * k / 3 - 0.002, y + f, z + 0.012, x + f + (w - 2 * f) * k / 3 + 0.002, y + h - f, z + 0.014, M.satin, { color: 0x77726a, solid: false, cast: false });
+    for (let k = 1; k < 6; k++) b.box(x + f, y + f + (h - 2 * f) * k / 6 - 0.002, z + 0.012, x + w - f, y + f + (h - 2 * f) * k / 6 + 0.002, z + 0.014, M.satin, { color: 0x77726a, solid: false, cast: false });
   } else {
     b.box(x + g, y + g, z, x + w - g, y + h - g, z + 0.014, M.wood, { ...wo, color: new THREE.Color(col).multiplyScalar(0.93) });
     b.box(x + g, y + g, z + 0.014, x + f, y + h - g, z + 0.022, M.wood, wo);

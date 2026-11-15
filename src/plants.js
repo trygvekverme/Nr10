@@ -83,7 +83,7 @@ export function bush(b, M, x, y, z, o = {}) {
     const px = x + Math.cos(yaw) * hr * rx, pz = z + Math.sin(yaw) * hr * rx, py = cy + v * rad * ry;
     const g = leafGeometry({
       len: (o.leaf ?? 0.07) * (0.7 + R() * 0.6), wid: (o.leafW ?? 0.035) * (0.7 + R() * 0.6),
-      elev: (o.elev ?? 0.3) + v * 0.5 + (R() - 0.5) * 0.5, bend: o.bend ?? 0.6, segs: o.segs ?? 2,
+      elev: (o.elev ?? 0.3) + v * 0.5 + (R() - 0.5) * 0.5, bend: o.bend ?? 0.6, segs: o.segs ?? 3,
       shape: o.shape ?? 'oval', base: o.base ?? 0x2e6a2a, tip: R() < (o.lightChance ?? 0.3) ? (o.tip2 ?? 0x6aa84a) : (o.tip ?? 0x3f8236),
       mid: o.mid ?? null, fold: o.fold ?? 0.15,
     });

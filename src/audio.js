@@ -189,7 +189,7 @@ export class GameAudio {
   bass(m, t, dur, vel) {
     const ctx = this.ctx, f = mtof(m);
     const g = ctx.createGain();
-    this.env(g, t, 0.012, 0.3 * vel, 0.35, 0.45, dur, 0.12);
+    this.env(g, t, 0.012, 0.24 * vel, 0.35, 0.45, dur, 0.12);
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 1.2;
     lp.frequency.setValueAtTime(900, t); lp.frequency.exponentialRampToValueAtTime(260, t + 0.3);
     const o1 = ctx.createOscillator(); o1.type = 'triangle'; o1.frequency.value = f;

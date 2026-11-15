@@ -113,6 +113,10 @@ export class Bird {
     }
     if ((flags & 4) && this.vy > 0) this.vy *= 0.5;
 
+    // an occasional contact call on the wing
+    this.callT = (this.callT ?? rand(5, 10)) - dt;
+    if (this.callT <= 0) { this.callT = rand(7, 16); if (Math.random() < 0.6) this.startAct('chirp'); }
+
     // --- landing
     const descending = inp.v < -0.2 || this.vy < -0.3;
     let nearGround = false;
