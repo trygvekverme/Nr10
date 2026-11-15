@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "nr10",
     "public": "public",
     "predeploy": ["npm install --no-audit --no-fund", "npm run build"],
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],

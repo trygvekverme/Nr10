@@ -43,9 +43,9 @@ npx firebase-tools login
 npm run deploy
 ```
 
-Prosjektet (`nr10-e1bb2`) står i `.firebaserc`, og bygget (`npm run build`)
-kjøres automatisk før opplasting. Spillet havner på
-<https://nr10-e1bb2.web.app>.
+Prosjektet (`nr10-e1bb2`) står i `.firebaserc` og siden (`nr10`) i
+`firebase.json`. Bygget (`npm run build`) kjøres automatisk før opplasting.
+Spillet havner på <https://nr10.web.app>.
 
 ## Hva som er med
 
