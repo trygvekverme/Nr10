@@ -29,6 +29,22 @@ Fuglen lander av seg selv når du flyr nedover mot et møbel, en hylle, et
 rekkverk eller gulvet. Når den sitter, hopper den med «fremover» og snur seg
 med «sving». Hold «opp» for å lette igjen.
 
+## Publisere på Firebase Hosting
+
+Repoet er satt opp for Firebase Hosting (`firebase.json`). Bare mappa
+`public/` lastes opp – den lages av bygget og inneholder kun spillet, ikke
+filmen eller kildekoden.
+
+```bash
+npx firebase-tools login
+```
+
+```bash
+npx firebase-tools deploy --only hosting --project DITT-PROSJEKT-ID
+```
+
+Bygget (`npm run build`) kjøres automatisk før opplasting.
+
 ## Hva som er med
 
 - Entré, korridor, kjøkken, spisestue (ett trinn ned), stue, musikkrok, trapp
@@ -53,6 +69,7 @@ Bildene av personer i filmen er byttet ut med nøytrale plassholdere.
 | `src/budgie.js`, `src/bird.js` | fuglemodellen og hvordan den flyr, lander og oppfører seg |
 | `src/physics.js`, `src/camera.js`, `src/controls.js` | kollisjon, kamera, styring |
 | `src/audio.js` | musikk og lyd |
-| `build.mjs` | pakker alt til `undulaten.html` (`npm install && npm run build`) |
+| `build.mjs` | pakker alt til `undulaten.html` og `public/index.html` (`npm install && npm run build`) |
+| `firebase.json` | oppsett for Firebase Hosting |
 
 Three.js ligger i `vendor/` (MIT-lisens).

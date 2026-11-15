@@ -1,9 +1,10 @@
 // Bundles the game into one self-contained file, undulaten.html, that can be
-// opened straight from disk (no web server needed).
-//   node build.mjs                 -> undulaten.html
+// opened straight from disk (no web server needed). The same file is written
+// to public/index.html, which is what Firebase Hosting deploys.
+//   node build.mjs                 -> undulaten.html, public/index.html
 //   node build.mjs --fragment out  -> also writes a body-only fragment (for embedding)
 import { build } from 'esbuild';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 const result = await build({
   entryPoints: ['src/main.js'],
@@ -21,7 +22,10 @@ const re = /<!-- build:js -->[\s\S]*?<!-- \/build:js -->/;
 if (!re.test(html)) throw new Error('build marker not found in index.html');
 const out = html.replace(re, () => `<script>\n${js}</script>`);
 writeFileSync('undulaten.html', out);
-console.log('undulaten.html', (out.length / 1024).toFixed(0) + ' kB');
+// the folder Firebase Hosting serves: only the game, nothing else from the repo
+mkdirSync('public', { recursive: true });
+writeFileSync('public/index.html', out);
+console.log('undulaten.html + public/index.html', (out.length / 1024).toFixed(0) + ' kB');
 
 const i = process.argv.indexOf('--fragment');
 if (i > 0) {

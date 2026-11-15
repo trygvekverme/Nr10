@@ -1,1 +1,5 @@
 node_modules/
+# built by `npm run build`, deployed by Firebase Hosting
+public/
+.firebase/
+firebase-debug.log
