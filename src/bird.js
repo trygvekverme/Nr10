@@ -66,6 +66,12 @@ export class Bird {
 
   update(dt, inp) {
     this.time += dt;
+    // safety net: should the bird ever end up outside the apartment, bring it home
+    const q = this.pos;
+    if (q.x < -3.7 || q.x > 5.2 || q.z < -0.4 || q.z > 14.3 || q.y < -0.4 || q.y > 5.6 || q.y !== q.y) {
+      this.speed = 0; this.vy = 0; this.hop = null; this.takeoff = -1;
+      this.placeAt(0.19, 0.9, 2.05, Math.PI / 2);
+    }
     if (inp.chirp) this.startAct('chirp');
     if (this.mode === 'fly') this.updateFly(dt, inp); else this.updatePerch(dt, inp);
     this.updateFace(dt);
@@ -99,10 +105,14 @@ export class Bird {
 
     const fx = Math.sin(this.yaw), fz = Math.cos(this.yaw);
     const ox = this.pos.x, oz = this.pos.z;
-    this.pos.x += fx * this.speed * dt;
-    this.pos.z += fz * this.speed * dt;
-    this.pos.y += this.vy * dt;
-    const flags = this.world.resolve(this.pos, R_BODY);
+    // move in small sub-steps so thin things (glass, railings) can never be skipped over
+    const mx = fx * this.speed * dt, mz = fz * this.speed * dt, my = this.vy * dt;
+    const sub = Math.max(1, Math.ceil(Math.hypot(mx, my, mz) / 0.025));
+    let flags = 0;
+    for (let k = 0; k < sub; k++) {
+      this.pos.x += mx / sub; this.pos.z += mz / sub; this.pos.y += my / sub;
+      flags |= this.world.resolve(this.pos, R_BODY);
+    }
     if (flags & 8) {
       const wanted = Math.abs(this.speed) * dt;
       if (wanted > 1e-5) {
@@ -322,6 +332,14 @@ export class Bird {
     const hx = t.x, hz = t.z;
     this.world.resolve(t, 0.032);
     if (Math.hypot(t.x - hx, t.z - hz) > 0.008 || before !== before) return false;
+    // ... and nothing thin (a window pane, a railing) in between?
+    const top = Math.max(this.pos.y, g.y + m.standHeight()) + 0.012;
+    for (let k = 1; k <= 3; k++) {
+      const px = this.pos.x + dx * k / 4, pz = this.pos.z + dz * k / 4;
+      t.set(px, top, pz);
+      this.world.resolve(t, 0.03);
+      if (Math.hypot(t.x - px, t.z - pz) > 0.006) return false;
+    }
     this.hop = {
       t: 0, dur: 0.15 + Math.abs(g.y - this.ground.y) * 0.5, height: 0.02 + Math.max(0, g.y - this.ground.y) * 0.6,
       from: this.pos.clone(), to: new THREE.Vector3(tx, g.y + m.standHeight(), tz),

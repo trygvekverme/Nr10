@@ -80,7 +80,8 @@ function windowX(b, M, x0, x1, y0, y1, zIn, zOut, out, o = {}) {
     const mx = x0 + (x1 - x0) * m;
     fr(mx - 0.012, y0, mx + 0.012, y1 - t);
   }
-  b.box(x0 + t, y0, zf - 0.004, x1 - t, y1 - t, zf + 0.004, M.glass, { cast: false, perch: false });
+  b.box(x0 + t, y0, zf - 0.004, x1 - t, y1 - t, zf + 0.004, M.glass, { cast: false, solid: false });
+  b.hit(x0, y0, zf - 0.035, x1, y1, zf + 0.035, { perch: false });
   if (o.handles) {
     for (const hx of o.handles) {
       b.cbox(hx, y0 + 0.95, zf + out * -0.05, 0.02, 0.13, 0.03, M.metal, { color: 0xd8d8d8, solid: false });
